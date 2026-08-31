@@ -615,7 +615,7 @@
         }
     </style>
 
-    <audio id="birthdaySong" loop preload="none" muted>
+    <audio id="birthdaySong" loop autoplay>
         <source src="Inthandham.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
@@ -732,66 +732,15 @@ Happy Anniversary, my love. ❤️</div>
     </footer>
 
     <!-- Music Button -->
-    <button id="musicButton" aria-label="Play/Pause Birthday Song" title="Play/Pause Birthday Song">🎵</button>
+    <button id="musicButton" aria-label="Play/Pause Birthday Song" title="Play/Pause Birthday Song">🔊</button>
 
     <script>
         // Music functionality
         const musicButton = document.getElementById('musicButton');
         const birthdaySong = document.getElementById('birthdaySong');
-        let isPlaying = false;
-        let autoPlayAttempted = false;
+        let isPlaying = true;
 
-        // Function to play music
-        function playMusic() {
-            // Reset to beginning
-            birthdaySong.currentTime = 0;
-            
-            const playPromise = birthdaySong.play();
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    musicButton.textContent = '🔊';
-                    isPlaying = true;
-                }).catch(error => {
-                    console.log('Autoplay prevented by browser (user interaction required)');
-                    musicButton.textContent = '🎵';
-                    isPlaying = false;
-                });
-            }
-        }
-
-        // Try to autoplay when page loads
-        window.addEventListener('load', function() {
-            if (!autoPlayAttempted) {
-                autoPlayAttempted = true;
-                // Unmute after a brief delay to trigger autoplay
-                setTimeout(() => {
-                    birthdaySong.muted = false;
-                    playMusic();
-                }, 500);
-            }
-        });
-
-        // Also try on first user interaction
-        document.addEventListener('click', function() {
-            if (!isPlaying && !autoPlayAttempted) {
-                autoPlayAttempted = true;
-                birthdaySong.muted = false;
-                playMusic();
-            }
-        }, { once: true });
-
-        // Music button click handler
-        musicButton.addEventListener('click', function() {
-            if (isPlaying) {
-                birthdaySong.pause();
-                musicButton.textContent = '🎵';
-                isPlaying = false;
-            } else {
-                birthdaySong.muted = false;
-                playMusic();
-            }
-        });
-
+        // Update button when audio plays/pauses
         birthdaySong.addEventListener('play', function() {
             musicButton.textContent = '🔊';
             isPlaying = true;
@@ -805,6 +754,15 @@ Happy Anniversary, my love. ❤️</div>
         birthdaySong.addEventListener('error', function() {
             console.error('Audio file loading error');
             musicButton.textContent = '❌';
+        });
+
+        // Music button click handler
+        musicButton.addEventListener('click', function() {
+            if (isPlaying) {
+                birthdaySong.pause();
+            } else {
+                birthdaySong.play();
+            }
         });
 
         // Floating hearts
