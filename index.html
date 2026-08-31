@@ -615,7 +615,7 @@
         }
     </style>
 
-    <audio id="birthdaySong" loop preload="metadata">
+    <audio id="birthdaySong" loop preload="none">
         <source src="Inthandham.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
@@ -672,7 +672,7 @@ Happy Birthday, Baby. Happy Anniversary. ❤️</div>
                 <div class="memory-text">
                     <h3>Every Moment with You</h3>
                     <p>Some people create ordinary memories. But not you.</p>
-                    <p>The ordinary moments we share become the most beautiful memories. Laughing together, talking late into the night, those random inside jokes that nobody else understands – these are the things I treasure most.</p>
+                    <p>The ordinary moments we share become the most beautiful memories. Laughing together, talking late into the night, those random inside jokes that nobody else understands – these are the moments I treasure.</p>
                     <p>Here's to all the memories we've made and all the ones yet to come. Because with you, even the simplest moments feel like magic.</p>
                 </div>
             </div>
@@ -746,17 +746,23 @@ Happy Anniversary, my love. ❤️</div>
                 musicButton.textContent = '🎵';
                 isPlaying = false;
             } else {
+                // Reset to beginning
+                birthdaySong.currentTime = 0;
+                
                 const playPromise = birthdaySong.play();
                 if (playPromise !== undefined) {
                     playPromise.then(() => {
                         musicButton.textContent = '🔊';
                         isPlaying = true;
                     }).catch(error => {
-                        console.log('Audio playback failed:', error);
+                        console.error('Audio playback failed:', error);
+                        console.log('Error details:', error.name, error.message);
+                        alert('Audio playback failed. This could be due to browser autoplay policies or network issues.');
                         musicButton.textContent = '🎵';
                         isPlaying = false;
                     });
                 } else {
+                    // Older browsers
                     musicButton.textContent = '🔊';
                     isPlaying = true;
                 }
@@ -771,6 +777,13 @@ Happy Anniversary, my love. ❤️</div>
         birthdaySong.addEventListener('pause', function() {
             musicButton.textContent = '🎵';
             isPlaying = false;
+        });
+
+        birthdaySong.addEventListener('error', function() {
+            console.error('Audio file loading error');
+            console.log('Error:', birthdaySong.error);
+            alert('Could not load audio file. Please check the file path.');
+            musicButton.textContent = '❌';
         });
 
         // Floating hearts
