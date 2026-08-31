@@ -615,7 +615,7 @@
         }
     </style>
 
-    <audio id="birthdaySong" loop preload="none">
+    <audio id="birthdaySong" loop preload="none" muted>
         <source src="Inthandham.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
@@ -739,33 +739,56 @@ Happy Anniversary, my love. ❤️</div>
         const musicButton = document.getElementById('musicButton');
         const birthdaySong = document.getElementById('birthdaySong');
         let isPlaying = false;
+        let autoPlayAttempted = false;
 
+        // Function to play music
+        function playMusic() {
+            // Reset to beginning
+            birthdaySong.currentTime = 0;
+            
+            const playPromise = birthdaySong.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    musicButton.textContent = '🔊';
+                    isPlaying = true;
+                }).catch(error => {
+                    console.log('Autoplay prevented by browser (user interaction required)');
+                    musicButton.textContent = '🎵';
+                    isPlaying = false;
+                });
+            }
+        }
+
+        // Try to autoplay when page loads
+        window.addEventListener('load', function() {
+            if (!autoPlayAttempted) {
+                autoPlayAttempted = true;
+                // Unmute after a brief delay to trigger autoplay
+                setTimeout(() => {
+                    birthdaySong.muted = false;
+                    playMusic();
+                }, 500);
+            }
+        });
+
+        // Also try on first user interaction
+        document.addEventListener('click', function() {
+            if (!isPlaying && !autoPlayAttempted) {
+                autoPlayAttempted = true;
+                birthdaySong.muted = false;
+                playMusic();
+            }
+        }, { once: true });
+
+        // Music button click handler
         musicButton.addEventListener('click', function() {
             if (isPlaying) {
                 birthdaySong.pause();
                 musicButton.textContent = '🎵';
                 isPlaying = false;
             } else {
-                // Reset to beginning
-                birthdaySong.currentTime = 0;
-                
-                const playPromise = birthdaySong.play();
-                if (playPromise !== undefined) {
-                    playPromise.then(() => {
-                        musicButton.textContent = '🔊';
-                        isPlaying = true;
-                    }).catch(error => {
-                        console.error('Audio playback failed:', error);
-                        console.log('Error details:', error.name, error.message);
-                        alert('Audio playback failed. This could be due to browser autoplay policies or network issues.');
-                        musicButton.textContent = '🎵';
-                        isPlaying = false;
-                    });
-                } else {
-                    // Older browsers
-                    musicButton.textContent = '🔊';
-                    isPlaying = true;
-                }
+                birthdaySong.muted = false;
+                playMusic();
             }
         });
 
@@ -781,8 +804,6 @@ Happy Anniversary, my love. ❤️</div>
 
         birthdaySong.addEventListener('error', function() {
             console.error('Audio file loading error');
-            console.log('Error:', birthdaySong.error);
-            alert('Could not load audio file. Please check the file path.');
             musicButton.textContent = '❌';
         });
 
